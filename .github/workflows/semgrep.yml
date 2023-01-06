@@ -21,6 +21,4 @@ jobs:
       image: returntocorp/semgrep
     steps:
     - uses: actions/checkout@v3
-    - run: apk add nodejs npm
-    - run: npm install --package-lock
-    - run: semgrep ci
+    - run: apk add nodejs npm && npm install --package-lock && semgrep ci
