@@ -20,7 +20,7 @@ jobs:
       image: returntocorp/semgrep
     steps:
     - uses: actions/checkout@v3
-    - run: sudo apt install nodejs
+    - run: apt install nodejs
     - run: apt install npm
     - run: npm install --package-lock
     - run: semgrep ci
