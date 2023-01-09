@@ -26,4 +26,3 @@ jobs:
     - run: npm install --package-lock
     - run: ls 
     - run: ls && semgrep ci
-    - run: ls && semgrep ci --supply-chain
