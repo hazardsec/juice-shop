@@ -23,7 +23,7 @@ jobs:
     - uses: actions/checkout@v3
     - run: apk add nodejs npm
     - run: ls
-    - run: npm install --package-lock
+    - run: npm install --package-lock-only
     - run: ls 
     - run: cat package-lock.json
     - run: git config --global --add safe.directory /__w/juice-shop/juice-shop
@@ -31,4 +31,4 @@ jobs:
     - run: git config --global user.name "hazardsec"
     - run: git add -f package-lock.json
     - run: git commit -m "Test adding package-lock.json"
-    - run: ls && semgrep ci
+    - run: ls && semgrep ci --supply-chain
