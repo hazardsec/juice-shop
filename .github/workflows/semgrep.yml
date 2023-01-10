@@ -1,5 +1,4 @@
 on:
-  workflow_dispatch:
   pull_request: {}
   push:
     branches:
@@ -21,4 +20,4 @@ jobs:
       image: returntocorp/semgrep
     steps:
     - uses: actions/checkout@v3
-    - run: ls && semgrep ci
+    - run: semgrep ci
