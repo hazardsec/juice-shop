@@ -22,6 +22,6 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - run: apk add nodejs npm
-    - run: npm i ngcc
+    - run: npm i -g @angular/cli@latest
     - run: npm i --package-lock-only
     - run: semgrep ci
