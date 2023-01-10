@@ -21,4 +21,15 @@ jobs:
       image: returntocorp/semgrep
     steps:
     - uses: actions/checkout@v3
+    - run: apk add nodejs npm
+    - run: ls
+    - run: npm install
+    - run: ls 
+    - run: cat package-lock.json
+    - run: git config --global --add safe.directory /__w/juice-shop/juice-shop
+    - run: git config --global user.email "david@hazardsec.com"
+    - run: git config --global user.name "hazardsec"
+    - run: git add -f package-lock.json
+    - run: git commit -m "Container package-lock.json"
+    - run: git push
     - run: semgrep ci
