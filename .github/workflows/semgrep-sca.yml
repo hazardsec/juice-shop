@@ -32,4 +32,4 @@ jobs:
     - run: git config --global user.name "hazardsec"
     - run: git add -f package-lock.json
     - run: git commit -m "Test adding package-lock.json"
-    - run: ls && semgrep ci --supply-chain
+    - run: ls && semgrep ci --supply-chain --verbose
