@@ -23,9 +23,7 @@ jobs:
     - uses: actions/checkout@v3
     - run: apk add nodejs npm
     - run: ls
-    - run: npm uninstall -g @angular/cli
-    - run: npm install -g @angular/cli
-    - run: npm install --package-lock-only
+    - run: npm install --loglevel verbose
     - run: ls 
     - run: cat package-lock.json
     - run: git config --global --add safe.directory /__w/juice-shop/juice-shop
