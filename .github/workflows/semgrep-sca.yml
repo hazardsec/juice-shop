@@ -23,6 +23,7 @@ jobs:
     - uses: actions/checkout@v3
     - run: apk add nodejs npm
     - run: ls
+    - run: rm -f .npmrc
     - run: npm install --loglevel verbose
     - run: ls 
     - run: cat package-lock.json
