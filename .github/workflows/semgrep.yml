@@ -11,14 +11,42 @@ on:
   # random HH:MM to avoid a load spike on GitHub Actions at 00:00
   - cron: 21 20 * * *
 name: Semgrep
+env:
+  CYCLONEDX_NPM_VERSION: '^2.0.0||^3.0.0'
+  SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
 jobs:
   semgrep:
     name: Scan
-    runs-on: ubuntu-24.04
-    env:
-      SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        node-version: [18, 20, 21, 22]
+      fail-fast: false
     container:
-      image: returntocorp/semgrep
+      image: returntocorp/semgrep      
     steps:
-    - uses: actions/checkout@v3  
-    - run: apk add nodejs npm && npm install --package-lock --lockfile-version 2 && semgrep ci
+      - name: "Check out Git repository"
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 #v4.2.2
+      - name: "Use Node.js ${{ matrix.node-version }}"
+        uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af #v4.1.0
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: "Install CLI tools"
+        run: |
+          npm install -g @cyclonedx/cyclonedx-npm@$CYCLONEDX_NPM_VERSION
+          npm install -g grunt-cli
+      - name: "Set packaging options for Grunt"
+        run: |
+          if [ "$RUNNER_OS" == "Windows" ]; then
+          echo "PCKG_OS_NAME=win32" >> $GITHUB_ENV
+          elif [ "$RUNNER_OS" == "macOS" ]; then
+          echo "PCKG_OS_NAME=darwin" >> $GITHUB_ENV
+          else
+          echo "PCKG_OS_NAME=linux" >> $GITHUB_ENV
+          fi
+          echo "PCKG_CPU_ARCH=x64" >> $GITHUB_ENV
+          echo "PCKG_NODE_VERSION=${{ matrix.node-version }}" >> $GITHUB_ENV
+        shell: bash
+      - name: "Build package-lock.json and scan"
+        run: apk add nodejs npm && npm install --package-lock --lockfile-version 2 && semgrep ci
