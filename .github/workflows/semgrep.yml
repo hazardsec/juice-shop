@@ -18,7 +18,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        node-version: [18]
+        node-version: [20]
       fail-fast: false
     env:
       CYCLONEDX_NPM_VERSION: '^2.0.0||^3.0.0'
