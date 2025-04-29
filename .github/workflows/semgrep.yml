@@ -22,9 +22,7 @@ jobs:
       fail-fast: false
     env:
       CYCLONEDX_NPM_VERSION: '^2.0.0||^3.0.0'
-      SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}       
-    container:
-      image: returntocorp/semgrep      
+      SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}          
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
