@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing'
+import { type ComponentFixture, TestBed } from '@angular/core/testing'
 import { TranslateModule } from '@ngx-translate/core'
 
 import { CodeAreaComponent } from './code-area.component'
@@ -10,9 +10,9 @@ describe('CodeAreaComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [
-        TranslateModule.forRoot()
-      ],
-      declarations: [CodeAreaComponent]
+        TranslateModule.forRoot(),
+        CodeAreaComponent
+      ]
     })
       .compileComponents()
   })

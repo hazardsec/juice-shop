@@ -1,28 +1,26 @@
 /*
- * Copyright (c) 2014-2023 Bjoern Kimminich & the OWASP Juice Shop contributors.
+ * Copyright (c) 2014-2025 Bjoern Kimminich & the OWASP Juice Shop contributors.
  * SPDX-License-Identifier: MIT
  */
 
 import { retrieveChallengesWithCodeSnippet } from './vulnCodeSnippet'
-import { Request, Response, NextFunction } from 'express'
+import { type Request, type Response, type NextFunction } from 'express'
 import { ChallengeModel } from '../models/challenge'
 import { UserModel } from '../models/user'
 import { WalletModel } from '../models/wallet'
 import { FeedbackModel } from '../models/feedback'
 import { ComplaintModel } from '../models/complaint'
 import { Op } from 'sequelize'
-import challengeUtils = require('../lib/challengeUtils')
-
-const logger = require('../lib/logger')
-const Prometheus = require('prom-client')
-const onFinished = require('on-finished')
-const orders = require('../data/mongodb').orders
-const reviews = require('../data/mongodb').reviews
-const challenges = require('../data/datacache').challenges
-const utils = require('../lib/utils')
-const antiCheat = require('../lib/antiCheat')
-const accuracy = require('../lib/accuracy')
-const config = require('config')
+import * as challengeUtils from '../lib/challengeUtils'
+import logger from '../lib/logger'
+import config from 'config'
+import * as utils from '../lib/utils'
+import { totalCheatScore } from '../lib/antiCheat'
+import * as accuracy from '../lib/accuracy'
+import { reviewsCollection, ordersCollection } from '../data/mongodb'
+import { challenges } from '../data/datacache'
+import * as Prometheus from 'prom-client'
+import onFinished from 'on-finished'
 
 const register = Prometheus.register
 
@@ -38,7 +36,7 @@ const fileUploadErrorsMetric = new Prometheus.Counter({
   labelNames: ['file_type']
 })
 
-exports.observeRequestMetricsMiddleware = function observeRequestMetricsMiddleware () {
+export function observeRequestMetricsMiddleware () {
   const httpRequestsMetric = new Prometheus.Counter({
     name: 'http_requests_count',
     help: 'Total HTTP request count grouped by status code.',
@@ -54,10 +52,10 @@ exports.observeRequestMetricsMiddleware = function observeRequestMetricsMiddlewa
   }
 }
 
-exports.observeFileUploadMetricsMiddleware = function observeFileUploadMetricsMiddleware () {
+export function observeFileUploadMetricsMiddleware () {
   return ({ file }: Request, res: Response, next: NextFunction) => {
     onFinished(res, () => {
-      if (file) {
+      if (file != null) {
         res.statusCode < 400 ? fileUploadsCountMetric.labels(file.mimetype).inc() : fileUploadErrorsMetric.labels(file.mimetype).inc()
       }
     })
@@ -65,7 +63,7 @@ exports.observeFileUploadMetricsMiddleware = function observeFileUploadMetricsMi
   }
 }
 
-exports.serveMetrics = function serveMetrics () {
+export function serveMetrics () {
   return async (req: Request, res: Response, next: NextFunction) => {
     challengeUtils.solveIf(challenges.exposedMetricsChallenge, () => {
       const userAgent = req.headers['user-agent'] ?? ''
@@ -76,14 +74,14 @@ exports.serveMetrics = function serveMetrics () {
   }
 }
 
-exports.observeMetrics = function observeMetrics () {
-  const app = config.get('application.customMetricsPrefix')
-  const intervalCollector = Prometheus.collectDefaultMetrics({ timeout: 5000 })
+export function observeMetrics () {
+  const app = config.get<string>('application.customMetricsPrefix')
+  Prometheus.collectDefaultMetrics({})
   register.setDefaultLabels({ app })
 
   const versionMetrics = new Prometheus.Gauge({
     name: `${app}_version_info`,
-    help: `Release version of ${config.get('application.name')}.`,
+    help: `Release version of ${config.get<string>('application.name')}.`,
     labelNames: ['version', 'major', 'minor', 'patch']
   })
 
@@ -118,7 +116,7 @@ exports.observeMetrics = function observeMetrics () {
 
   const orderMetrics = new Prometheus.Gauge({
     name: `${app}_orders_placed_total`,
-    help: `Number of orders placed in ${config.get('application.name')}.`
+    help: `Number of orders placed in ${config.get<string>('application.name')}.`
   })
 
   const userMetrics = new Prometheus.Gauge({
@@ -187,15 +185,15 @@ exports.observeMetrics = function observeMetrics () {
         })
       })
 
-      cheatScoreMetrics.set(antiCheat.totalCheatScore())
+      cheatScoreMetrics.set(totalCheatScore())
       accuracyMetrics.set({ phase: 'find it' }, accuracy.totalFindItAccuracy())
       accuracyMetrics.set({ phase: 'fix it' }, accuracy.totalFixItAccuracy())
 
-      orders.count({}).then((orderCount: Number) => {
+      ordersCollection.count({}).then((orderCount: number) => {
         if (orderCount) orderMetrics.set(orderCount)
       })
 
-      reviews.count({}).then((reviewCount: Number) => {
+      reviewsCollection.count({}).then((reviewCount: number) => {
         if (reviewCount) interactionsMetrics.set({ type: 'review' }, reviewCount)
       })
 
@@ -207,11 +205,11 @@ exports.observeMetrics = function observeMetrics () {
         if (count) userMetrics.set({ type: 'deluxe' }, count)
       })
 
-      void UserModel.count().then((count: Number) => {
+      void UserModel.count().then((count: number) => {
         if (count) userTotalMetrics.set(count)
       })
 
-      void WalletModel.sum('balance').then((totalBalance: Number) => {
+      void WalletModel.sum('balance').then((totalBalance: number) => {
         if (totalBalance) walletMetrics.set(totalBalance)
       })
 
@@ -228,8 +226,7 @@ exports.observeMetrics = function observeMetrics () {
   }, 5000)
 
   return {
-    register: register,
-    probe: intervalCollector,
-    updateLoop: updateLoop
+    register,
+    updateLoop
   }
 }

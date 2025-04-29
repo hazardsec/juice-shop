@@ -1,11 +1,12 @@
 /*
- * Copyright (c) 2014-2023 Bjoern Kimminich & the OWASP Juice Shop contributors.
+ * Copyright (c) 2014-2025 Bjoern Kimminich & the OWASP Juice Shop contributors.
  * SPDX-License-Identifier: MIT
  */
 
-import frisby = require('frisby')
-const fs = require('fs')
-const path = require('path')
+import * as frisby from 'frisby'
+import path from 'node:path'
+import fs from 'node:fs'
+
 const URL = 'http://localhost:3000'
 const API_URL = 'http://localhost:3000/metrics'
 
@@ -32,9 +33,9 @@ describe('/metrics', () => {
   xit('GET file upload metrics via public API', () => { // FIXME Flaky on CI/CD on at least Windows
     const file = path.resolve(__dirname, '../files/validSizeAndTypeForClient.pdf')
     const form = frisby.formData()
-    form.append('file', fs.createReadStream(file))
+    form.append('file', fs.createReadStream(file) as unknown as Blob) // casting to blob as the frisby types are wrong and wont accept the fileStream type
 
-    // @ts-expect-error
+    // @ts-expect-error FIXME form.getHeaders() is not found
     return frisby.post(URL + '/file-upload', { headers: { 'Content-Type': form.getHeaders()['content-type'] }, body: form })
       .expect('status', 204)
       .then(() => {
@@ -48,9 +49,9 @@ describe('/metrics', () => {
   xit('GET file upload error metrics via public API', () => { // FIXME Flaky on CI/CD on at least Windows
     const file = path.resolve(__dirname, '../files/invalidSizeForServer.pdf')
     const form = frisby.formData()
-    form.append('file', fs.createReadStream(file))
+    form.append('file', fs.createReadStream(file) as unknown as Blob) // casting to blob as the frisby types are wrong and wont accept the fileStream type
 
-    // @ts-expect-error
+    // @ts-expect-error FIXME form.getHeaders() is not found
     return frisby.post(URL + '/file-upload', { headers: { 'Content-Type': form.getHeaders()['content-type'] }, body: form })
       .expect('status', 500)
       .then(() => {

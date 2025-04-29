@@ -1,19 +1,20 @@
 /*
- * Copyright (c) 2014-2023 Bjoern Kimminich & the OWASP Juice Shop contributors.
+ * Copyright (c) 2014-2025 Bjoern Kimminich & the OWASP Juice Shop contributors.
  * SPDX-License-Identifier: MIT
  */
 
-import { Component, OnInit } from '@angular/core'
+import { Component, type OnInit } from '@angular/core'
 import { ConfigurationService } from '../Services/configuration.service'
 import { MatDialog } from '@angular/material/dialog'
 import { WelcomeBannerComponent } from '../welcome-banner/welcome-banner.component'
-import { CookieService } from 'ngx-cookie'
+import { CookieService } from 'ngy-cookie'
 
 @Component({
   selector: 'app-welcome',
   templateUrl: 'welcome.component.html',
-  styleUrls: ['./welcome.component.scss']
-  })
+  styleUrls: ['./welcome.component.scss'],
+  standalone: true
+})
 
 export class WelcomeComponent implements OnInit {
   private readonly welcomeBannerStatusCookieKey = 'welcomebanner_status'
@@ -34,7 +35,7 @@ export class WelcomeComponent implements OnInit {
             top: '50px'
           }
         })
-      }, (err) => console.log(err))
+      }, (err) => { console.log(err) })
     }
   }
 }
