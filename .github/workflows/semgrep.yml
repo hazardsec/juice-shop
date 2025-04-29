@@ -26,13 +26,10 @@ jobs:
     container:
       image: returntocorp/semgrep      
     steps:
-      - name: "Check out Git repository"
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 #v4.2.2
-      - name: "Use Node.js ${{ matrix.node-version }}"
-        if: ${{ success() }}
-        uses: actions/setup-node@v4 #v4.1.0
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 18
       - name: "Install CLI tools"
         if: ${{ success() }}      
         run: |
