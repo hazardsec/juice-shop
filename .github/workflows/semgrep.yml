@@ -36,7 +36,6 @@ jobs:
       - name: "Install CLI tools"
         if: ${{ success() }}      
         run: |
-          npm install -g @cyclonedx/cyclonedx-npm@$CYCLONEDX_NPM_VERSION
           npm install -g grunt-cli
       - name: "Set packaging options for Grunt"
         if: ${{ success() }}      
