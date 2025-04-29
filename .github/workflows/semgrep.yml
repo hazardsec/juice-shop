@@ -11,18 +11,18 @@ on:
   # random HH:MM to avoid a load spike on GitHub Actions at 00:00
   - cron: 21 20 * * *
 name: Semgrep
-env:
-  CYCLONEDX_NPM_VERSION: '^2.0.0||^3.0.0'
-  SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
 jobs:
   semgrep:
     name: Scan
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}   
     strategy:
       matrix:
         os: [ubuntu-latest]
         node-version: [18]
       fail-fast: false
+    env:
+      CYCLONEDX_NPM_VERSION: '^2.0.0||^3.0.0'
+      SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}       
     container:
       image: returntocorp/semgrep      
     steps:
